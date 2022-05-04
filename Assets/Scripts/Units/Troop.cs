@@ -8,12 +8,8 @@ public class Troop : MonoBehaviour
     [SerializeField] protected int _health = 100;
     public Transform Target;
     public Action TroopDied;
-
-    private void Start()
-    {
-        _agent = GetComponent<NavMeshAgent>();
-    }
-
+    public Action<Troop> TroopReady;
+    
     public void TakeDamage(int damage)
     {
         _health -= damage;
@@ -21,6 +17,24 @@ public class Troop : MonoBehaviour
         {
             Die();
         }
+    }
+
+    public void Play()
+    {
+        _agent.speed = _originalSpeed;
+        // TODO : enable attacking
+    }
+
+    public void Pause()
+    {
+        _agent.speed = 0;
+        //TODO : disable attacking
+    }
+    
+    
+    public void FindNewTarget()
+    {
+        throw new NotImplementedException();
     }
 
     public void SetTarget(Troop target)
@@ -35,6 +49,12 @@ public class Troop : MonoBehaviour
             if (Vector3.SqrMagnitude (previousTargetPosition - target.position) > range) {
                 _agent.SetDestination (target.position);
                 previousTargetPosition = target.position;
+            }
+
+            if (_agent.pathStatus == NavMeshPathStatus.PathComplete && !_signaledReady)
+            {
+                TroopReady?.Invoke(this);
+                _signaledReady = true;
             }
             yield return new WaitForSeconds (0.7f);
         }
@@ -52,13 +72,17 @@ public class Troop : MonoBehaviour
         _lockedOnTarget = false;
         FindNewTarget();
     }
-
-    private void FindNewTarget()
+    
+    private void Start()
     {
-        throw new NotImplementedException();
+        _agent = GetComponent<NavMeshAgent>();
+        _originalSpeed = _agent.speed;
+        _agent.speed = 0;
     }
 
     protected Troop _target;
     protected NavMeshAgent _agent;
     private bool _lockedOnTarget;
+    private bool _signaledReady;
+    private float _originalSpeed;
 }
