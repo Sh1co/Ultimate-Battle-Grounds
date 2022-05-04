@@ -17,7 +17,8 @@ namespace UnityTemplateProjects
             _countTarget = FirstArmy.Count + SecondArmy.Count;
             battleController.FirstArmy = SetArmy(FirstArmy, FirstArmySpawn, 2.5f, 2.5f);
             battleController.SecondArmy = SetArmy(SecondArmy, SecondArmySpawn, 2.5f, 2.5f);
-
+            battleController.Pause();
+            battleController.SetTroopsEnemies();
             return battleController;
         }
 

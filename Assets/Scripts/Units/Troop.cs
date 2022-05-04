@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -9,7 +10,8 @@ public class Troop : MonoBehaviour
     public Transform Target;
     public Action TroopDied;
     public Action<Troop> TroopReady;
-    
+    public List<Troop> Enemies;
+
     public void TakeDamage(int damage)
     {
         _health -= damage;
@@ -34,11 +36,25 @@ public class Troop : MonoBehaviour
     
     public void FindNewTarget()
     {
-        throw new NotImplementedException();
+        Troop target = null;
+        float minDistance = float.MaxValue;
+        foreach (var troop in Enemies)
+        {
+            if (troop == null) continue;
+
+            Vector3 distance = troop.transform.position - transform.position;
+            if (distance.magnitude < minDistance)
+            {
+                minDistance = distance.magnitude;
+                target = troop;
+            }
+        }
+        if (target != null) SetTarget(target);
     }
 
     public void SetTarget(Troop target)
     {
+        target.TroopDied += TargetDied;
         StartCoroutine(FollowTarget(1f, target.transform));
     }
     
@@ -80,7 +96,7 @@ public class Troop : MonoBehaviour
         _agent.speed = 0;
     }
 
-    protected Troop _target;
+    
     protected NavMeshAgent _agent;
     private bool _lockedOnTarget;
     private bool _signaledReady;
