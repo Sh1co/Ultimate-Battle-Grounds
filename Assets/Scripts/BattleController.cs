@@ -45,4 +45,17 @@ public class BattleController
             troop.Enemies = FirstArmy;
         }
     }
+
+    public void StartTroopSearch()
+    {
+        foreach (var troop in FirstArmy)
+        {
+            troop.FindNewTarget();
+        }
+
+        foreach (var troop in SecondArmy)
+        {
+            troop.FindNewTarget();
+        }
+    }
 }
