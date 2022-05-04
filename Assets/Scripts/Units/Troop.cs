@@ -89,11 +89,10 @@ public class Troop : MonoBehaviour
         FindNewTarget();
     }
     
-    private void Start()
+    private void OnEnable()
     {
         _agent = GetComponent<NavMeshAgent>();
         _originalSpeed = _agent.speed;
-        _agent.speed = 0;
     }
 
     
