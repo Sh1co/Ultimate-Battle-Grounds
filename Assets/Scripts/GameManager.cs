@@ -21,7 +21,7 @@ public class GameManager : MonoBehaviour
         if (_troopsReady && _controllerReady && !_battleReady)
         {
             _battleReady = true;
-            Debug.Log("battle is ready");
+            Debug.Log("battle is ready, press F to start...");
         }
         
         if(Input.GetKeyDown(KeyCode.F) && _battleReady) _battleController.Play();
