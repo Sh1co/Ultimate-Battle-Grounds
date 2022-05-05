@@ -70,7 +70,7 @@ public class Troop : MonoBehaviour
             if (target == null)
             {
                 _obstacle.enabled = false;
-                yield return new WaitForSeconds(0.1f);
+                yield return new WaitForSeconds(0.15f);
                 _agent.enabled = true;
                 _agent.ResetPath();
                 FindNewTarget();
@@ -82,10 +82,11 @@ public class Troop : MonoBehaviour
                 if(_obstacle.enabled)
                 {
                     _obstacle.enabled = false;
-                    yield return new WaitForSeconds(0.1f);
+                    yield return new WaitForSeconds(0.15f);
                     _agent.enabled = true;
                 }
                 if (_agent.isStopped && !_paused) _agent.isStopped = false;
+                if (target == null) continue;
                 if (Vector3.SqrMagnitude(previousTargetPosition - target.position) >= 0.5f)
                 {
                     _agent.SetDestination(target.position);
