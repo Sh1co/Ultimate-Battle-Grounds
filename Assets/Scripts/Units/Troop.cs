@@ -69,6 +69,9 @@ public class Troop : MonoBehaviour
         {
             if (target == null)
             {
+                _obstacle.enabled = false;
+                yield return new WaitForSeconds(0.1f);
+                _agent.enabled = true;
                 _agent.ResetPath();
                 FindNewTarget();
                 break;
@@ -76,6 +79,12 @@ public class Troop : MonoBehaviour
 
             if (Vector3.SqrMagnitude(transform.position - target.position) >= _attackRange)
             {
+                if(_obstacle.enabled)
+                {
+                    _obstacle.enabled = false;
+                    yield return new WaitForSeconds(0.1f);
+                    _agent.enabled = true;
+                }
                 if (_agent.isStopped && !_paused) _agent.isStopped = false;
                 if (Vector3.SqrMagnitude(previousTargetPosition - target.position) >= 0.5f)
                 {
@@ -85,7 +94,9 @@ public class Troop : MonoBehaviour
             }
             else
             {
-                _agent.isStopped = true;
+                /*_agent.isStopped = true;*/
+                _agent.enabled = false;
+                _obstacle.enabled = true;
             }
 
             if (_agent.pathStatus == NavMeshPathStatus.PathComplete && !_signaledReady)
@@ -125,10 +136,12 @@ public class Troop : MonoBehaviour
     private void OnEnable()
     {
         _agent = GetComponent<NavMeshAgent>();
+        _obstacle = GetComponent<NavMeshObstacle>();
     }
 
 
     protected NavMeshAgent _agent;
+    protected NavMeshObstacle _obstacle;
     public Troop _target;
     private bool _lockedOnTarget;
     private bool _signaledReady;
@@ -136,3 +149,4 @@ public class Troop : MonoBehaviour
     private bool _attacking = true;
     private bool _paused = false;
 }
+
