@@ -31,14 +31,13 @@ public class GameSetter : MonoBehaviour
         int xShift = Mathf.FloorToInt((armySqrt / 2) * xSpacing);
         int yShift = Mathf.FloorToInt((armySqrt / 2) * ySpacing);
 
-        for (var i = 0; i < armySqrt; i++)
+        for (var i = armySqrt-1; i >=0 ; i--)
         {
             for (var j = 0; j < armySqrt; j++)
             {
                 if (armyIndex == army.Count) break;
-                var troop = Instantiate(army[armyIndex],
-                    new Vector3(spawnPoint.position.x + xSpacing * i - xShift, spawnPoint.position.y,
-                        spawnPoint.position.z + ySpacing * j - yShift), Quaternion.identity, spawnPoint);
+                var troop = Instantiate(army[armyIndex],spawnPoint, false);
+                troop.transform.localPosition = new Vector3(xSpacing * i - xShift, 0, ySpacing * j - yShift);
                 troop.TroopReady += TroopReady;
                 setTroops.Add(troop);
                 armyIndex++;
