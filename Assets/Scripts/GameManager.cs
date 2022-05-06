@@ -7,7 +7,14 @@ public class GameManager : MonoBehaviour
 {
     public List<Troop> FirstArmy;
     public List<Troop> SecondArmy;
+    public Action BattleReady;
 
+
+    public BattleController GetBattleController()
+    {
+        return _battleController;
+    }
+    
     private void Start()
     {
         _gameSetter = GetComponent<GameSetter>();
@@ -21,6 +28,7 @@ public class GameManager : MonoBehaviour
         if (_troopsReady && _controllerReady && !_battleReady)
         {
             _battleReady = true;
+            BattleReady?.Invoke();
             Debug.Log("battle is ready, press F to start...");
         }
         

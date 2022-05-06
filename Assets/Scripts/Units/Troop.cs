@@ -11,7 +11,9 @@ public class Troop : MonoBehaviour
     [SerializeField] protected float _attackInterval = 2.0f;
     [SerializeField] protected int _attackValue = 20;
     public Action<Troop> TroopReady;
+    public Action<Troop> TroopDied;
     public List<Troop> Enemies;
+    public int Team;
 
     public void TakeDamage(int damage)
     {
@@ -131,6 +133,7 @@ public class Troop : MonoBehaviour
 
     private void Die()
     {
+        TroopDied?.Invoke(this);
         Destroy(gameObject);
     }
 
