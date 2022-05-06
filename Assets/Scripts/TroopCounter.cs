@@ -21,7 +21,6 @@ public class TroopCounter : MonoBehaviour
 
         troop.TroopDied -= TroopDied;
         TroopCountChanged?.Invoke();
-        Debug.Log("First army: " + FirstArmyCount + ". Second army: " + SecondArmyCount);
     }
 
     private void SetupCount()
@@ -41,7 +40,6 @@ public class TroopCounter : MonoBehaviour
         }
 
         TroopCountChanged?.Invoke();
-        Debug.Log("First army: " + FirstArmyCount + ". Second army: " + SecondArmyCount);
     }
 
     private void OnEnable()
