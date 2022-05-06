@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 
 public class GameManager : MonoBehaviour
@@ -10,6 +11,11 @@ public class GameManager : MonoBehaviour
     public List<Troop> SecondArmy;
     public Action BattleReady;
     public Action<float> TimeScaleChanged;
+
+    [Header("Attempt to make the outcome of the battle as random as possible")] [SerializeField]
+    private bool _makeBattleNonDeterminate;
+
+    [Range(5, 50)] [SerializeField] private int _attemptHardness = 10;
 
 
     public BattleController GetBattleController()
@@ -25,7 +31,36 @@ public class GameManager : MonoBehaviour
         _controllerReady = true;
         
         SetupTimeScale();
+        if (_makeBattleNonDeterminate) FixBattle();
     }
+
+    private void FixBattle()
+    {
+        foreach (var troop in _battleController.FirstArmy)
+        {
+            RandomizeTroop(troop);
+        }
+        foreach (var troop in _battleController.SecondArmy)
+        {
+            RandomizeTroop(troop);
+        }
+    }
+
+    private void RandomizeTroop(Troop troop)
+    {
+        troop.Health +=
+            Mathf.FloorToInt(troop.Health * (Random.Range(0, _attemptHardness) / 100.0f)
+                                          * (Random.value > 0.5f
+                                              ? 1.0f
+                                              : -1.0f));
+
+        troop.AttackValue +=
+            Mathf.FloorToInt(troop.AttackValue * (Random.Range(0, _attemptHardness) / 100.0f)
+                                               * (Random.value > 0.5f
+                                                   ? 1.0f
+                                                   : -1.0f));
+    }
+
     private void Update()
     {
         if (_troopsReady && _controllerReady && !_battleReady)

@@ -6,10 +6,10 @@ using UnityEngine.AI;
 
 public class Troop : MonoBehaviour
 {
-    [SerializeField] protected int _health = 100;
+    public int Health = 100;
     [SerializeField] protected float _attackRange = 2.0f;
     [SerializeField] protected float _attackInterval = 2.0f;
-    [SerializeField] protected int _attackValue = 20;
+    public int AttackValue = 20;
     public Action<Troop> TroopReady;
     public Action<Troop> TroopDied;
     public List<Troop> Enemies;
@@ -17,8 +17,8 @@ public class Troop : MonoBehaviour
 
     public void TakeDamage(int damage)
     {
-        _health -= damage;
-        if (_health <= 0)
+        Health -= damage;
+        if (Health <= 0)
         {
             Die();
         }
@@ -128,7 +128,7 @@ public class Troop : MonoBehaviour
 
     private void Attack()
     {
-        _target.TakeDamage(_attackValue);
+        _target.TakeDamage(AttackValue);
     }
 
     private void Die()
