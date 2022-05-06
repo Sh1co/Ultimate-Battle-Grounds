@@ -81,7 +81,7 @@ public class Troop : MonoBehaviour
 
             if (Vector3.SqrMagnitude(transform.position - target.position) >= _attackRange)
             {
-                if(_obstacle.enabled)
+                if(_obstacle.enabled || !_agent.enabled)
                 {
                     _obstacle.enabled = false;
                     yield return new WaitForSeconds(0.15f);
