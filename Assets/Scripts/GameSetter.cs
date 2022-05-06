@@ -14,15 +14,15 @@ public class GameSetter : MonoBehaviour
     {
         var battleController = new BattleController();
         _countTarget = FirstArmy.Count + SecondArmy.Count;
-        battleController.FirstArmy = SetArmy(FirstArmy, FirstArmySpawn, 2.5f, 2.5f);
-        battleController.SecondArmy = SetArmy(SecondArmy, SecondArmySpawn, 2.5f, 2.5f);
+        battleController.FirstArmy = SetArmy(FirstArmy, FirstArmySpawn, 2.5f, 2.5f, 1);
+        battleController.SecondArmy = SetArmy(SecondArmy, SecondArmySpawn, 2.5f, 2.5f, 2);
         battleController.Pause();
         battleController.SetTroopsEnemies();
         battleController.StartTroopSearch();
         return battleController;
     }
 
-    private List<Troop> SetArmy(List<Troop> army, Transform spawnPoint, float xSpacing, float ySpacing)
+    private List<Troop> SetArmy(List<Troop> army, Transform spawnPoint, float xSpacing, float ySpacing, int team)
     {
         List<Troop> setTroops = new List<Troop>();
 
@@ -31,14 +31,15 @@ public class GameSetter : MonoBehaviour
         int xShift = Mathf.FloorToInt((armySqrt / 2) * xSpacing);
         int yShift = Mathf.FloorToInt((armySqrt / 2) * ySpacing);
 
-        for (var i = armySqrt-1; i >=0 ; i--)
+        for (var i = armySqrt - 1; i >= 0; i--)
         {
             for (var j = 0; j < armySqrt; j++)
             {
                 if (armyIndex == army.Count) break;
-                var troop = Instantiate(army[armyIndex],spawnPoint, false);
+                var troop = Instantiate(army[armyIndex], spawnPoint, false);
                 troop.transform.localPosition = new Vector3(xSpacing * i - xShift, 0, ySpacing * j - yShift);
                 troop.TroopReady += TroopReady;
+                troop.Team = team;
                 setTroops.Add(troop);
                 armyIndex++;
             }

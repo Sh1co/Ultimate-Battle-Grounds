@@ -11,7 +11,9 @@ public class Troop : MonoBehaviour
     [SerializeField] protected float _attackInterval = 2.0f;
     [SerializeField] protected int _attackValue = 20;
     public Action<Troop> TroopReady;
+    public Action<Troop> TroopDied;
     public List<Troop> Enemies;
+    public int Team;
 
     public void TakeDamage(int damage)
     {
@@ -79,7 +81,7 @@ public class Troop : MonoBehaviour
 
             if (Vector3.SqrMagnitude(transform.position - target.position) >= _attackRange)
             {
-                if(_obstacle.enabled)
+                if(_obstacle.enabled || !_agent.enabled)
                 {
                     _obstacle.enabled = false;
                     yield return new WaitForSeconds(0.15f);
@@ -131,6 +133,7 @@ public class Troop : MonoBehaviour
 
     private void Die()
     {
+        TroopDied?.Invoke(this);
         Destroy(gameObject);
     }
 
