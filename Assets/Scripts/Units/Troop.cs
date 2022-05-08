@@ -14,6 +14,7 @@ public class Troop : MonoBehaviour
     public Action<Troop> TroopDied;
     public List<Troop> Enemies;
     public int Team;
+    [SerializeField] private float _obstacleToAgentSwitchDelay = 0.15f;
 
     public void TakeDamage(int damage)
     {
@@ -72,19 +73,19 @@ public class Troop : MonoBehaviour
             if (target == null)
             {
                 _obstacle.enabled = false;
-                yield return new WaitForSeconds(0.15f);
+                yield return new WaitForSeconds(_obstacleToAgentSwitchDelay);
                 _agent.enabled = true;
                 _agent.ResetPath();
                 FindNewTarget();
                 break;
             }
 
-            if (Vector3.SqrMagnitude(transform.position - target.position) >= _attackRange)
+            if (Vector3.Magnitude(transform.position - target.position) >= _attackRange)
             {
                 if(_obstacle.enabled || !_agent.enabled)
                 {
                     _obstacle.enabled = false;
-                    yield return new WaitForSeconds(0.15f);
+                    yield return new WaitForSeconds(_obstacleToAgentSwitchDelay);
                     _agent.enabled = true;
                 }
                 if (_agent.isStopped && !_paused) _agent.isStopped = false;
@@ -97,7 +98,6 @@ public class Troop : MonoBehaviour
             }
             else
             {
-                /*_agent.isStopped = true;*/
                 _agent.enabled = false;
                 _obstacle.enabled = true;
             }
