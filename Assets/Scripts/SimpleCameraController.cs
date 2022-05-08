@@ -118,6 +118,7 @@ namespace UnityTemplateProjects
 
         void OnEnable()
         {
+            Cursor.lockState = CursorLockMode.Locked;
             m_TargetCameraState.SetFromTransform(transform);
             m_InterpolatingCameraState.SetFromTransform(transform);
         }
@@ -171,34 +172,20 @@ namespace UnityTemplateProjects
 				#endif
             }
 
-            // Hide and lock cursor when right mouse button pressed
-            if (IsRightMouseButtonDown())
-            {
-                Cursor.lockState = CursorLockMode.Locked;
-            }
-
-            // Unlock and show cursor when right mouse button released
-            if (IsRightMouseButtonUp())
-            {
-                Cursor.visible = true;
-                Cursor.lockState = CursorLockMode.None;
-            }
-
             // Rotation
-            if (IsCameraRotationAllowed())
-            {
-                var mouseMovement = GetInputLookRotation() * Time.deltaTime * 5;
-                if (invertY)
-                    mouseMovement.y = -mouseMovement.y;
-                
-                var mouseSensitivityFactor = mouseSensitivityCurve.Evaluate(mouseMovement.magnitude);
 
-                m_TargetCameraState.yaw += mouseMovement.x * mouseSensitivityFactor;
-                m_TargetCameraState.pitch += mouseMovement.y * mouseSensitivityFactor;
-            }
+            var mouseMovement = GetInputLookRotation() * (Time.unscaledDeltaTime * 5);
+            if (invertY)
+                mouseMovement.y = -mouseMovement.y;
+
+            var mouseSensitivityFactor = mouseSensitivityCurve.Evaluate(mouseMovement.magnitude);
+
+            m_TargetCameraState.yaw += mouseMovement.x * mouseSensitivityFactor;
+            m_TargetCameraState.pitch += mouseMovement.y * mouseSensitivityFactor;
+            
             
             // Translation
-            var translation = GetInputTranslationDirection() * Time.deltaTime;
+            var translation = GetInputTranslationDirection() * Time.unscaledDeltaTime;
 
             // Speed up movement when shift key held
             if (IsBoostPressed())
@@ -214,8 +201,8 @@ namespace UnityTemplateProjects
 
             // Framerate-independent interpolation
             // Calculate the lerp amount, such that we get 99% of the way to our target in the specified time
-            var positionLerpPct = 1f - Mathf.Exp((Mathf.Log(1f - 0.99f) / positionLerpTime) * Time.deltaTime);
-            var rotationLerpPct = 1f - Mathf.Exp((Mathf.Log(1f - 0.99f) / rotationLerpTime) * Time.deltaTime);
+            var positionLerpPct = 1f - Mathf.Exp((Mathf.Log(1f - 0.99f) / positionLerpTime) * Time.unscaledDeltaTime);
+            var rotationLerpPct = 1f - Mathf.Exp((Mathf.Log(1f - 0.99f) / rotationLerpTime) * Time.unscaledDeltaTime);
             m_InterpolatingCameraState.LerpTowards(m_TargetCameraState, positionLerpPct, rotationLerpPct);
 
             m_InterpolatingCameraState.UpdateTransform(transform);
@@ -257,35 +244,6 @@ namespace UnityTemplateProjects
             return Keyboard.current != null ? Keyboard.current.escapeKey.isPressed : false; 
 #else
             return Input.GetKey(KeyCode.Escape);
-#endif
-        }
-
-        bool IsCameraRotationAllowed()
-        {
-#if ENABLE_INPUT_SYSTEM
-            bool canRotate = Mouse.current != null ? Mouse.current.rightButton.isPressed : false;
-            canRotate |= Gamepad.current != null ? Gamepad.current.rightStick.ReadValue().magnitude > 0 : false;
-            return canRotate;
-#else
-            return Input.GetMouseButton(1);
-#endif
-        }
-
-        bool IsRightMouseButtonDown()
-        {
-#if ENABLE_INPUT_SYSTEM
-            return Mouse.current != null ? Mouse.current.rightButton.isPressed : false;
-#else
-            return Input.GetMouseButtonDown(1);
-#endif
-        }
-
-        bool IsRightMouseButtonUp()
-        {
-#if ENABLE_INPUT_SYSTEM
-            return Mouse.current != null ? !Mouse.current.rightButton.isPressed : false;
-#else
-            return Input.GetMouseButtonUp(1);
 #endif
         }
 
