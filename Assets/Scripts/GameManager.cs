@@ -100,7 +100,7 @@ public class GameManager : MonoBehaviour
         TimeScaleChanged?.Invoke(Time.timeScale);
     }
 
-    private void OnDisable()
+    private void OnDestroy()
     {
         _gameSetter.ArmiesSet -= TroopsReady;
     }
