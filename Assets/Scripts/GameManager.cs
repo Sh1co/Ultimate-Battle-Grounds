@@ -46,19 +46,23 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Creates a variation in troop health and attack value by [attemptHardness]% of the original value
+    /// </summary>
+    /// <param name="troop"></param>
     private void RandomizeTroop(Troop troop)
     {
-        troop.Health +=
-            Mathf.FloorToInt(troop.Health * (Random.Range(0, _attemptHardness) / 100.0f)
-                                          * (Random.value > 0.5f
-                                              ? 1.0f
-                                              : -1.0f));
+        troop.Health += GetValueVariation(troop.Health);
 
-        troop.AttackValue +=
-            Mathf.FloorToInt(troop.AttackValue * (Random.Range(0, _attemptHardness) / 100.0f)
-                                               * (Random.value > 0.5f
-                                                   ? 1.0f
-                                                   : -1.0f));
+        troop.AttackValue += GetValueVariation(troop.AttackValue);
+    }
+
+    private int GetValueVariation(int value)
+    {
+        return Mathf.FloorToInt(value * (Random.Range(0, _attemptHardness) / 100.0f)
+                                      * (Random.value > 0.5f
+                                          ? 1.0f
+                                          : -1.0f));
     }
 
     private void Update()

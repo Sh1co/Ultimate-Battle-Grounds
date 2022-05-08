@@ -9,28 +9,14 @@ public class BattleController
 
     public void Play()
     {
-        foreach (var troop in FirstArmy.Where(troop => troop != null))
-        {
-            troop.Play();
-        }
-
-        foreach (var troop in SecondArmy.Where(troop => troop != null))
-        {
-            troop.Play();
-        }
+        PlayArmy(FirstArmy);
+        PlayArmy(SecondArmy);
     }
 
     public void Pause()
     {
-        foreach (var troop in FirstArmy.Where(troop => troop != null))
-        {
-            troop.Pause();
-        }
-
-        foreach (var troop in SecondArmy.Where(troop => troop != null))
-        {
-            troop.Pause();
-        }
+        PauseArmy(FirstArmy);
+        PauseArmy(SecondArmy);
     }
 
     public void SetTroopsEnemies()
@@ -56,6 +42,21 @@ public class BattleController
         foreach (var troop in SecondArmy)
         {
             troop.FindNewTarget();
+        }
+    }
+
+    private void PlayArmy(List<Troop> army)
+    {
+        foreach (var troop in army.Where(troop => troop != null))
+        {
+            troop.Play();
+        }
+    }
+    private void PauseArmy(List<Troop> army)
+    {
+        foreach (var troop in army.Where(troop => troop != null))
+        {
+            troop.Pause();
         }
     }
 }

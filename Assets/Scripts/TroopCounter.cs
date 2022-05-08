@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class TroopCounter : MonoBehaviour
 {
-    [HideInInspector] public int FirstArmyCount;
-    [HideInInspector] public int SecondArmyCount;
+    public int FirstArmyCount { get; private set; }
+    public int SecondArmyCount { get; private set; }
     public Action TroopCountChanged;
 
     private void TroopDied(Troop troop)
