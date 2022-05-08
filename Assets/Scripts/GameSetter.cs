@@ -7,15 +7,17 @@ public class GameSetter : MonoBehaviour
 {
     public Transform FirstArmySpawn;
     public Transform SecondArmySpawn;
+    [SerializeField] private float _xSpacing = 2.5f;
+    [SerializeField] private float _ySpacing = 2.5f;
 
     public Action ArmiesSet;
 
-    public BattleController SetArmies(List<Troop> FirstArmy, List<Troop> SecondArmy)
+    public BattleController SetArmies(List<Troop> firstArmy, List<Troop> secondArmy)
     {
         var battleController = new BattleController();
-        _countTarget = FirstArmy.Count + SecondArmy.Count;
-        battleController.FirstArmy = SetArmy(FirstArmy, FirstArmySpawn, 2.5f, 2.5f, 1);
-        battleController.SecondArmy = SetArmy(SecondArmy, SecondArmySpawn, 2.5f, 2.5f, 2);
+        _countTarget = firstArmy.Count + secondArmy.Count;
+        battleController.FirstArmy = SetArmy(firstArmy, FirstArmySpawn, _xSpacing, _ySpacing, 1);
+        battleController.SecondArmy = SetArmy(secondArmy, SecondArmySpawn, _xSpacing, _ySpacing, 2);
         battleController.Pause();
         battleController.SetTroopsEnemies();
         battleController.StartTroopSearch();
