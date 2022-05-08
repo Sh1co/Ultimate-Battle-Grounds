@@ -110,12 +110,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9ac2a3dea546451d96c7474d1d49220d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _health: 100
+  Health: 100
   _attackRange: 10
   _attackInterval: 2
-  _attackValue: 20
+  AttackValue: 20
   Enemies: []
   Team: 0
+  _obstacleToAgentSwitchDelay: 0.15
   _target: {fileID: 0}
 --- !u!195 &4084311309316166546
 NavMeshAgent:

@@ -80,7 +80,7 @@ public class Troop : MonoBehaviour
                 break;
             }
 
-            if (Vector3.Magnitude(transform.position - target.position) >= _attackRange)
+            if (Vector3.SqrMagnitude(transform.position - target.position) >= _attackRange)
             {
                 if(_obstacle.enabled || !_agent.enabled)
                 {
