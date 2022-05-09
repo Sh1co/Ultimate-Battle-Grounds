@@ -13,10 +13,11 @@ public class GameSetter : MonoBehaviour
 
     public BattleController SetArmies(List<Troop> firstArmy, List<Troop> secondArmy)
     {
-        var battleController = new BattleController();
         _countTarget = firstArmy.Count + secondArmy.Count;
-        battleController.FirstArmy = SetArmy(firstArmy, FirstArmySpawn, _xSpacing, _ySpacing, 1);
-        battleController.SecondArmy = SetArmy(secondArmy, SecondArmySpawn, _xSpacing, _ySpacing, 2);
+        var firstSetArmy = SetArmy(firstArmy, FirstArmySpawn, _xSpacing, _ySpacing, 1);
+        var secondSetArmy = SetArmy(secondArmy, SecondArmySpawn, _xSpacing, _ySpacing, 2);
+        var selectedTroopsDict = GetComponent<SelectedTroopsDict>();
+        var battleController = new BattleController(firstSetArmy, secondSetArmy, selectedTroopsDict, _xSpacing, _ySpacing);
         battleController.Pause();
         return battleController;
     }
@@ -25,10 +26,10 @@ public class GameSetter : MonoBehaviour
     {
         List<Troop> setTroops = new List<Troop>();
 
-        int armyIndex = 0;
+        var armyIndex = 0;
         var armySqrt = Mathf.Ceil(Mathf.Sqrt(army.Count));
-        int xShift = Mathf.FloorToInt((armySqrt / 2) * xSpacing);
-        int yShift = Mathf.FloorToInt((armySqrt / 2) * ySpacing);
+        var xShift = Mathf.FloorToInt((armySqrt / 2) * xSpacing);
+        var yShift = Mathf.FloorToInt((armySqrt / 2) * ySpacing);
 
         for (var i = armySqrt - 1; i >= 0; i--)
         {

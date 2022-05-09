@@ -11,6 +11,7 @@ public class GameManager : MonoBehaviour
     public List<Troop> SecondArmy;
     public Action BattleReady;
     public Action<float> TimeScaleChanged;
+    [SerializeField] private LayerMask _groundLayerMask;
 
     [Header("Attempt to make the outcome of the battle as random as possible")] [SerializeField]
     private bool _makeBattleNonDeterminate;
@@ -86,6 +87,15 @@ public class GameManager : MonoBehaviour
             if (_battleSpeedIndex < _timeScales.Count-1) _battleSpeedIndex++;
             Time.timeScale = _timeScales[_battleSpeedIndex];
             TimeScaleChanged?.Invoke(Time.timeScale);
+        }
+
+        if (Input.GetMouseButtonDown(1))
+        {
+            var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            if (Physics.Raycast(ray, out var hitInfo, int.MaxValue, _groundLayerMask))
+            {
+                _battleController.OrderSelectedToPosition(hitInfo.point);
+            }
         }
         
     }

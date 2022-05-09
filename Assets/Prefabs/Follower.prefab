@@ -112,7 +112,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9ac2a3dea546451d96c7474d1d49220d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _startingState: 1
+  _startingState: 0
   Health: 100
   AttackValue: 20
   _attackRange: 3.5
@@ -154,7 +154,7 @@ NavMeshObstacle:
   m_Enabled: 0
   serializedVersion: 3
   m_Shape: 1
-  m_Extents: {x: 0.5, y: 0.5, z: 0.5}
+  m_Extents: {x: 0.25, y: 0.25, z: 0.25}
   m_MoveThreshold: 0
   m_Carve: 1
   m_CarveOnlyStationary: 1

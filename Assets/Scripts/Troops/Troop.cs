@@ -40,6 +40,7 @@ public class Troop : MonoBehaviour
 
     public void GoToPosition(Vector3 position)
     {
+        if(_state!= TroopStates.UnderCommand)_stateBeforeCommand = _state;
         StartCoroutine(FollowCommand(position));
     }
     
@@ -151,9 +152,10 @@ public class Troop : MonoBehaviour
                 Attack();
                 break;
             case TroopStates.UnderCommand:
-                if (_agent.remainingDistance < 0.1f)
+                if (_agent.remainingDistance < 0.1f && _agent.hasPath)
                 {
-                    FindNewTarget();
+                    if (_stateBeforeCommand == TroopStates.Attacking) FindNewTarget();
+                    else StartCoroutine(SwitchState(_stateBeforeCommand));
                 }
                 break;
             case TroopStates.StandGround:
@@ -182,8 +184,9 @@ public class Troop : MonoBehaviour
     private void OnEnable()
     {
         _agent = GetComponent<NavMeshAgent>();
+        _agent.SetDestination(Vector3.zero);
         _obstacle = GetComponent<NavMeshObstacle>();
-        _state = _startingState;
+        StartCoroutine(SwitchState(_startingState));
     }
 
 
@@ -193,5 +196,6 @@ public class Troop : MonoBehaviour
     private bool _lockedOnTarget;
     private float _attackWait;
     private TroopStates _state;
+    private TroopStates _stateBeforeCommand;
 }
 
