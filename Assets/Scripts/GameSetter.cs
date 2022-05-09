@@ -10,7 +10,6 @@ public class GameSetter : MonoBehaviour
     [SerializeField] private float _xSpacing = 2.5f;
     [SerializeField] private float _ySpacing = 2.5f;
 
-    public Action ArmiesSet;
 
     public BattleController SetArmies(List<Troop> firstArmy, List<Troop> secondArmy)
     {
@@ -19,8 +18,6 @@ public class GameSetter : MonoBehaviour
         battleController.FirstArmy = SetArmy(firstArmy, FirstArmySpawn, _xSpacing, _ySpacing, 1);
         battleController.SecondArmy = SetArmy(secondArmy, SecondArmySpawn, _xSpacing, _ySpacing, 2);
         battleController.Pause();
-        battleController.SetTroopsEnemies();
-        battleController.StartTroopSearch();
         return battleController;
     }
 
@@ -40,7 +37,6 @@ public class GameSetter : MonoBehaviour
                 if (armyIndex == army.Count) break;
                 var troop = Instantiate(army[armyIndex], spawnPoint, false);
                 troop.transform.localPosition = new Vector3(xSpacing * i - xShift, 0, ySpacing * j - yShift);
-                troop.TroopReady += TroopReady;
                 troop.Team = team;
                 setTroops.Add(troop);
                 armyIndex++;
@@ -50,17 +46,6 @@ public class GameSetter : MonoBehaviour
         }
 
         return setTroops;
-    }
-
-    private void TroopReady(Troop troop)
-    {
-        troop.TroopReady -= TroopReady;
-        _initializedCounter++;
-
-        if (_initializedCounter == _countTarget)
-        {
-            ArmiesSet?.Invoke();
-        }
     }
 
     private int _initializedCounter = 0;

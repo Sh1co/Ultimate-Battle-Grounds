@@ -26,7 +26,6 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         _gameSetter = GetComponent<GameSetter>();
-        _gameSetter.ArmiesSet += TroopsReady;
         _battleController = _gameSetter.SetArmies(FirstArmy, SecondArmy);
         _controllerReady = true;
         
@@ -67,7 +66,7 @@ public class GameManager : MonoBehaviour
 
     private void Update()
     {
-        if (_troopsReady && _controllerReady && !_battleReady)
+        if ( _controllerReady && !_battleReady)
         {
             _battleReady = true;
             BattleReady?.Invoke();
@@ -91,11 +90,6 @@ public class GameManager : MonoBehaviour
         
     }
 
-    private void TroopsReady()
-    {
-        _troopsReady = true;
-    }
-    
     private void SetupTimeScale()
     {
         _battleSpeedIndex = _timeScales.IndexOf(1f);
@@ -104,14 +98,8 @@ public class GameManager : MonoBehaviour
         TimeScaleChanged?.Invoke(Time.timeScale);
     }
 
-    private void OnDestroy()
-    {
-        _gameSetter.ArmiesSet -= TroopsReady;
-    }
-
     private BattleController _battleController;
     private GameSetter _gameSetter;
-    private bool _troopsReady;
     private bool _controllerReady;
     private bool _battleReady;
     private int _battleSpeedIndex;

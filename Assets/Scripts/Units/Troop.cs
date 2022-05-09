@@ -6,14 +6,17 @@ using UnityEngine.AI;
 
 public class Troop : MonoBehaviour
 {
+    [SerializeField] private TroopStates _startingState = TroopStates.Idle;
     public int Health = 100;
+    public int AttackValue = 20;
     [SerializeField] protected float _attackRange = 2.0f;
     [SerializeField] protected float _attackInterval = 2.0f;
-    public int AttackValue = 20;
-    public Action<Troop> TroopReady;
+    [SerializeField] protected float _searchRadius = 100.0f;
+    [SerializeField] private LayerMask _searchMask;
+
+
     public Action<Troop> TroopDied;
-    public List<Troop> Enemies;
-    public int Team;
+    public int Team { get; set; }
     [SerializeField] private float _obstacleToAgentSwitchDelay = 0.15f;
 
     public void TakeDamage(int damage)
@@ -27,48 +30,51 @@ public class Troop : MonoBehaviour
 
     public void Play()
     {
-        _agent.isStopped = false;
-        _paused = false;
-        _attacking = true;
+        FindNewTarget();
     }
 
     public void Pause()
     {
-        _agent.isStopped = true;
-        _paused = true;
-        _attacking = false;
+        StartCoroutine(SwitchState(TroopStates.Idle));
     }
 
-
+    public void GoToPosition(Vector3 position)
+    {
+        StartCoroutine(FollowCommand(position));
+    }
+    
     public void FindNewTarget()
     {
+        Collider[] hitColliders = Physics.OverlapSphere(transform.position, _searchRadius,_searchMask);
         Troop target = null;
         float minDistance = float.MaxValue;
-        foreach (var troop in Enemies)
+        foreach (var hitCollider in hitColliders)
         {
-            if (troop == null) continue;
-            Vector3 distance = troop.transform.position - transform.position;
+            if(hitCollider.GetComponent<Troop>().Team == Team)continue;
+            Vector3 distance = hitCollider.transform.position - transform.position;
             if (distance.magnitude < minDistance)
             {
                 minDistance = distance.magnitude;
-                target = troop;
+                target = hitCollider.GetComponent<Troop>();
             }
         }
 
         if (target != null) SetTarget(target);
+        else StartCoroutine(SwitchState(TroopStates.Idle));
+
     }
 
-    public void SetTarget(Troop target)
+    private void SetTarget(Troop target)
     {
         _target = target;
         StartCoroutine(FollowTarget(target.transform));
     }
 
-    protected IEnumerator FollowTarget(Transform target)
+    private IEnumerator FollowTarget(Transform target)
     {
         Vector3 previousTargetPosition = new Vector3(float.PositiveInfinity, float.PositiveInfinity);
-        _lockedOnTarget = true;
-        while (_lockedOnTarget)
+        yield return StartCoroutine(SwitchState(TroopStates.Attacking));
+        while (_state == TroopStates.Attacking)
         {
             if (target == null)
             {
@@ -79,8 +85,7 @@ public class Troop : MonoBehaviour
                 FindNewTarget();
                 break;
             }
-
-            if (Vector3.SqrMagnitude(transform.position - target.position) >= _attackRange)
+            if (Vector3.Distance(transform.position, target.position) >= _attackRange)
             {
                 if(_obstacle.enabled || !_agent.enabled)
                 {
@@ -88,9 +93,9 @@ public class Troop : MonoBehaviour
                     yield return new WaitForSeconds(_obstacleToAgentSwitchDelay);
                     _agent.enabled = true;
                 }
-                if (_agent.isStopped && !_paused) _agent.isStopped = false;
                 if (target == null) continue;
-                if (Vector3.SqrMagnitude(previousTargetPosition - target.position) >= 0.5f)
+                if (_agent.isStopped) _agent.isStopped = false;
+                if (Vector3.Distance(previousTargetPosition, target.position) >= 1f)
                 {
                     _agent.SetDestination(target.position);
                     previousTargetPosition = target.position;
@@ -102,33 +107,70 @@ public class Troop : MonoBehaviour
                 _obstacle.enabled = true;
             }
 
-            if (_agent.pathStatus == NavMeshPathStatus.PathComplete && !_signaledReady)
-            {
-                TroopReady?.Invoke(this);
-                _signaledReady = true;
-            }
-
             yield return new WaitForSeconds(0.7f);
         }
+    }
 
-        yield return null;
+    private IEnumerator FollowCommand(Vector3 position)
+    {
+        yield return StartCoroutine(SwitchState(TroopStates.UnderCommand));
+        _agent.SetDestination(position);
+    }
+
+    private IEnumerator SwitchState(TroopStates state)
+    {
+        switch (state)
+        {
+            case TroopStates.Idle:
+                if(_agent.hasPath) _agent.ResetPath();
+                _agent.enabled = false;
+                _obstacle.enabled = true;
+                _state = state;
+                break;
+            case TroopStates.Attacking:
+            case TroopStates.UnderCommand:
+                _obstacle.enabled = false;
+                yield return new WaitForSeconds(_obstacleToAgentSwitchDelay);
+                _agent.enabled = true;
+                _state = state;
+                break;
+            case TroopStates.StandGround:
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(state), state, null);
+        }
     }
 
     private void Update()
     {
-        if (_attackWait < _attackInterval) _attackWait += Time.deltaTime;
-        if (_target == null || !_attacking) return;
-        if (Vector3.SqrMagnitude(transform.position - _target.transform.position) <= _attackRange)
+        switch (_state)
         {
-            if (_attackWait < _attackInterval) return;
-            Attack();
-            _attackWait = 0;
+            case TroopStates.Idle:
+                break;
+            case TroopStates.Attacking:
+                Attack();
+                break;
+            case TroopStates.UnderCommand:
+                if (_agent.remainingDistance < 0.1f)
+                {
+                    FindNewTarget();
+                }
+                break;
+            case TroopStates.StandGround:
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
         }
     }
 
     private void Attack()
     {
+        if (_target == null) return;
+        if (_attackWait < _attackInterval) _attackWait += Time.deltaTime;
+        if (!(Vector3.Distance(transform.position, _target.transform.position) <= _attackRange)) return;
+        if (_attackWait < _attackInterval) return;
         _target.TakeDamage(AttackValue);
+        _attackWait = 0;
     }
 
     private void Die()
@@ -141,16 +183,15 @@ public class Troop : MonoBehaviour
     {
         _agent = GetComponent<NavMeshAgent>();
         _obstacle = GetComponent<NavMeshObstacle>();
+        _state = _startingState;
     }
 
 
-    protected NavMeshAgent _agent;
-    protected NavMeshObstacle _obstacle;
-    public Troop _target;
+    private NavMeshAgent _agent;
+    private NavMeshObstacle _obstacle;
+    private Troop _target;
     private bool _lockedOnTarget;
-    private bool _signaledReady;
     private float _attackWait;
-    private bool _attacking = true;
-    private bool _paused = false;
+    public TroopStates _state;
 }
 

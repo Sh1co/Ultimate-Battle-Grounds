@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 4084311309316166549}
   - component: {fileID: 4084311309316166546}
   - component: {fileID: -533397034696745071}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Follower
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -111,14 +111,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9ac2a3dea546451d96c7474d1d49220d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _startingState: 1
   Health: 100
-  _attackRange: 10
-  _attackInterval: 2
   AttackValue: 20
-  Enemies: []
-  Team: 0
+  _attackRange: 3.5
+  _attackInterval: 2
+  _searchRadius: 100
+  _searchMask:
+    serializedVersion: 2
+    m_Bits: 64
   _obstacleToAgentSwitchDelay: 0.15
-  _target: {fileID: 0}
+  _state: 0
 --- !u!195 &4084311309316166546
 NavMeshAgent:
   m_ObjectHideFlags: 0
