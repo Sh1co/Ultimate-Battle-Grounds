@@ -192,6 +192,6 @@ public class Troop : MonoBehaviour
     private Troop _target;
     private bool _lockedOnTarget;
     private float _attackWait;
-    public TroopStates _state;
+    private TroopStates _state;
 }
 
