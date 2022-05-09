@@ -85,8 +85,8 @@ public class TroopsSelector : MonoBehaviour
             {
                 _selectedTroops.RemoveAll();
             }
-                
-            Destroy(_selectionBox, Time.deltaTime);
+
+            Destroy(_selectionBox, Time.fixedDeltaTime);
 
         }
 

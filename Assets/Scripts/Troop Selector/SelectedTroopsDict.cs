@@ -12,25 +12,25 @@ public class SelectedTroopsDict : MonoBehaviour
         if (!(SelectedTroops.ContainsKey(id)))
         {
             SelectedTroops.Add(id, troop);
-            //go.AddComponent<selection_component>();
+            troop.gameObject.AddComponent<selection_component>();
         }
     }
 
     public void Remove(int id)
     {
-        //Destroy(selectedTable[id].GetComponent<selection_component>());
+        Destroy(SelectedTroops[id].GetComponent<selection_component>());
         SelectedTroops.Remove(id);
     }
 
     public void RemoveAll()
     {
-        /*foreach(KeyValuePair<int,Troop> pair in SelectedTroops)
+        foreach(KeyValuePair<int,Troop> pair in SelectedTroops)
         {
             if(pair.Value != null)
             {
-                //Destroy(selectedTable[pair.Key].GetComponent<selection_component>());
+                Destroy(SelectedTroops[pair.Key].GetComponent<selection_component>());
             }
-        }*/
+        }
         SelectedTroops.Clear();
     }
 }
