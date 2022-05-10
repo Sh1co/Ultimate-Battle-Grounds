@@ -117,7 +117,7 @@ MonoBehaviour:
   AttackValue: 20
   _attackRange: 3.5
   _attackInterval: 2
-  _searchRadius: 100
+  _searchRadius: 500
   _searchMask:
     serializedVersion: 2
     m_Bits: 64
