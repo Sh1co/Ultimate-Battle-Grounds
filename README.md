@@ -29,3 +29,6 @@ Note: You can only select and move ally toops (red)
 ![Army selection](Screenshots/ss2.png)
 ![Troop comanding](Screenshots/ss3.png)
 ![Battle](Screenshots/ss4.png)
+
+## Build:
+[Download link](https://drive.google.com/file/d/18nhD-l8d0Fujhc_1p8CD28ew88_lL878/view?usp=sharing)
