@@ -36,14 +36,17 @@ public class TroopsSelector : MonoBehaviour
 
             if(Physics.Raycast(ray,out _raycastHit, int.MaxValue,_troopsLayerMask))
             {
-                if (Input.GetKey(KeyCode.LeftShift)) //inclusive select
+                if (_raycastHit.transform.GetComponent<Troop>().Team == 1)
                 {
-                    _selectedTroops.Add(_raycastHit.transform.GetComponent<Troop>());
-                }
-                else //exclusive selected
-                {
-                    _selectedTroops.RemoveAll();
-                    _selectedTroops.Add(_raycastHit.transform.GetComponent<Troop>());
+                    if (Input.GetKey(KeyCode.LeftShift)) //inclusive select
+                    {
+                        _selectedTroops.Add(_raycastHit.transform.GetComponent<Troop>());
+                    }
+                    else //exclusive selected
+                    {
+                        _selectedTroops.RemoveAll();
+                        _selectedTroops.Add(_raycastHit.transform.GetComponent<Troop>());
+                    }
                 }
             }
             else //if we didnt hit something
