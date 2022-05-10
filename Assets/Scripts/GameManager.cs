@@ -1,17 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using Random = UnityEngine.Random;
 
 
 public class GameManager : MonoBehaviour
 {
     [SerializeField] private List<float> _timeScales = new List<float> { 0.25f, 0.5f, 1f, 2f, 4f };
-    public List<Troop> FirstArmy;
-    public List<Troop> SecondArmy;
     public Action BattleReady;
     public Action<float> TimeScaleChanged;
     [SerializeField] private LayerMask _groundLayerMask;
+    [SerializeField] private string _mainMenuSceneName = "MainMenu";
 
     [Header("Attempt to make the outcome of the battle as random as possible")] [SerializeField]
     private bool _makeBattleNonDeterminate;
@@ -27,7 +27,7 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         _gameSetter = GetComponent<GameSetter>();
-        _battleController = _gameSetter.SetArmies(FirstArmy, SecondArmy);
+        _battleController = _gameSetter.SetArmies(BattleArmies.FirstArmy, BattleArmies.SecondArmy);
         _controllerReady = true;
         
         SetupTimeScale();
@@ -96,6 +96,11 @@ public class GameManager : MonoBehaviour
             {
                 _battleController.OrderSelectedToPosition(hitInfo.point);
             }
+        }
+
+        if (Input.GetKeyDown(KeyCode.M))
+        {
+            SceneManager.LoadScene(_mainMenuSceneName);
         }
         
     }
