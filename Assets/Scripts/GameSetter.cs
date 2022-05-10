@@ -10,17 +10,15 @@ public class GameSetter : MonoBehaviour
     [SerializeField] private float _xSpacing = 2.5f;
     [SerializeField] private float _ySpacing = 2.5f;
 
-    public Action ArmiesSet;
 
     public BattleController SetArmies(List<Troop> firstArmy, List<Troop> secondArmy)
     {
-        var battleController = new BattleController();
         _countTarget = firstArmy.Count + secondArmy.Count;
-        battleController.FirstArmy = SetArmy(firstArmy, FirstArmySpawn, _xSpacing, _ySpacing, 1);
-        battleController.SecondArmy = SetArmy(secondArmy, SecondArmySpawn, _xSpacing, _ySpacing, 2);
+        var firstSetArmy = SetArmy(firstArmy, FirstArmySpawn, _xSpacing, _ySpacing, 1);
+        var secondSetArmy = SetArmy(secondArmy, SecondArmySpawn, _xSpacing, _ySpacing, 2);
+        var selectedTroopsDict = GetComponent<SelectedTroopsDict>();
+        var battleController = new BattleController(firstSetArmy, secondSetArmy, selectedTroopsDict, _xSpacing, _ySpacing);
         battleController.Pause();
-        battleController.SetTroopsEnemies();
-        battleController.StartTroopSearch();
         return battleController;
     }
 
@@ -28,10 +26,10 @@ public class GameSetter : MonoBehaviour
     {
         List<Troop> setTroops = new List<Troop>();
 
-        int armyIndex = 0;
+        var armyIndex = 0;
         var armySqrt = Mathf.Ceil(Mathf.Sqrt(army.Count));
-        int xShift = Mathf.FloorToInt((armySqrt / 2) * xSpacing);
-        int yShift = Mathf.FloorToInt((armySqrt / 2) * ySpacing);
+        var xShift = Mathf.FloorToInt((armySqrt / 2) * xSpacing);
+        var yShift = Mathf.FloorToInt((armySqrt / 2) * ySpacing);
 
         for (var i = armySqrt - 1; i >= 0; i--)
         {
@@ -40,7 +38,6 @@ public class GameSetter : MonoBehaviour
                 if (armyIndex == army.Count) break;
                 var troop = Instantiate(army[armyIndex], spawnPoint, false);
                 troop.transform.localPosition = new Vector3(xSpacing * i - xShift, 0, ySpacing * j - yShift);
-                troop.TroopReady += TroopReady;
                 troop.Team = team;
                 setTroops.Add(troop);
                 armyIndex++;
@@ -50,17 +47,6 @@ public class GameSetter : MonoBehaviour
         }
 
         return setTroops;
-    }
-
-    private void TroopReady(Troop troop)
-    {
-        troop.TroopReady -= TroopReady;
-        _initializedCounter++;
-
-        if (_initializedCounter == _countTarget)
-        {
-            ArmiesSet?.Invoke();
-        }
     }
 
     private int _initializedCounter = 0;

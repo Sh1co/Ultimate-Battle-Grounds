@@ -1,11 +1,21 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 using UnityEngine.AI;
 
 public class BattleController
 {
-    public List<Troop> FirstArmy;
-    public List<Troop> SecondArmy;
+    public readonly List<Troop> FirstArmy;
+    public readonly List<Troop> SecondArmy;
+    public BattleController(List<Troop> firstArmy, List<Troop> secondArmy, SelectedTroopsDict selectedDict,
+        float xSpacing, float ySpacing)
+    {
+        FirstArmy = firstArmy;
+        SecondArmy = secondArmy;
+        _selectedTroopsDict = selectedDict;
+        _xSpacing = xSpacing;
+        _ySpacing = ySpacing;
+    }
 
     public void Play()
     {
@@ -19,30 +29,38 @@ public class BattleController
         PauseArmy(SecondArmy);
     }
 
-    public void SetTroopsEnemies()
+    public void OrderSelectedToPosition(Vector3 position)
     {
-        foreach (var troop in FirstArmy)
+        var positionsList = GetListOfPositions(position, _selectedTroopsDict.SelectedTroops.Count);
+        var index = 0;
+        
+        foreach (var pair in _selectedTroopsDict.SelectedTroops.Where(pair => pair.Value != null))
         {
-            troop.Enemies = SecondArmy;
-        }
-
-        foreach (var troop in SecondArmy)
-        {
-            troop.Enemies = FirstArmy;
+            pair.Value.GoToPosition(positionsList[index]);
+            index++;
         }
     }
 
-    public void StartTroopSearch()
+    private List<Vector3> GetListOfPositions(Vector3 center, int count)
     {
-        foreach (var troop in FirstArmy)
+        var formationSqrt = Mathf.Ceil(Mathf.Sqrt(count));
+        var xShift = Mathf.FloorToInt((formationSqrt / 2) * _xSpacing);
+        var yShift = Mathf.FloorToInt((formationSqrt / 2) * _ySpacing);
+        var positionsList = new List<Vector3>();
+        
+        for (var i = formationSqrt - 1; i >= 0; i--)
         {
-            troop.FindNewTarget();
+            for (var j = 0; j < formationSqrt; j++)
+            {
+                if (count == 0) break;
+                positionsList.Add(new Vector3(center.x + _xSpacing * i - xShift, center.y, center.z + _ySpacing * j - yShift));
+                count--;
+            }
+
+            if (count == 0) break;
         }
 
-        foreach (var troop in SecondArmy)
-        {
-            troop.FindNewTarget();
-        }
+        return positionsList;
     }
 
     private void PlayArmy(List<Troop> army)
@@ -59,4 +77,7 @@ public class BattleController
             troop.Pause();
         }
     }
+    private SelectedTroopsDict _selectedTroopsDict;
+    private float _xSpacing;
+    private float _ySpacing;
 }

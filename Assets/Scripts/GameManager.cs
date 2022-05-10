@@ -1,16 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using Random = UnityEngine.Random;
 
 
 public class GameManager : MonoBehaviour
 {
     [SerializeField] private List<float> _timeScales = new List<float> { 0.25f, 0.5f, 1f, 2f, 4f };
-    public List<Troop> FirstArmy;
-    public List<Troop> SecondArmy;
     public Action BattleReady;
     public Action<float> TimeScaleChanged;
+    [SerializeField] private LayerMask _groundLayerMask;
+    [SerializeField] private string _mainMenuSceneName = "MainMenu";
 
     [Header("Attempt to make the outcome of the battle as random as possible")] [SerializeField]
     private bool _makeBattleNonDeterminate;
@@ -26,8 +27,7 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         _gameSetter = GetComponent<GameSetter>();
-        _gameSetter.ArmiesSet += TroopsReady;
-        _battleController = _gameSetter.SetArmies(FirstArmy, SecondArmy);
+        _battleController = _gameSetter.SetArmies(BattleArmies.FirstArmy, BattleArmies.SecondArmy);
         _controllerReady = true;
         
         SetupTimeScale();
@@ -67,7 +67,7 @@ public class GameManager : MonoBehaviour
 
     private void Update()
     {
-        if (_troopsReady && _controllerReady && !_battleReady)
+        if ( _controllerReady && !_battleReady)
         {
             _battleReady = true;
             BattleReady?.Invoke();
@@ -88,14 +88,23 @@ public class GameManager : MonoBehaviour
             Time.timeScale = _timeScales[_battleSpeedIndex];
             TimeScaleChanged?.Invoke(Time.timeScale);
         }
+
+        if (Input.GetMouseButtonDown(1))
+        {
+            var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            if (Physics.Raycast(ray, out var hitInfo, int.MaxValue, _groundLayerMask))
+            {
+                _battleController.OrderSelectedToPosition(hitInfo.point);
+            }
+        }
+
+        if (Input.GetKeyDown(KeyCode.M))
+        {
+            SceneManager.LoadScene(_mainMenuSceneName);
+        }
         
     }
 
-    private void TroopsReady()
-    {
-        _troopsReady = true;
-    }
-    
     private void SetupTimeScale()
     {
         _battleSpeedIndex = _timeScales.IndexOf(1f);
@@ -104,14 +113,8 @@ public class GameManager : MonoBehaviour
         TimeScaleChanged?.Invoke(Time.timeScale);
     }
 
-    private void OnDestroy()
-    {
-        _gameSetter.ArmiesSet -= TroopsReady;
-    }
-
     private BattleController _battleController;
     private GameSetter _gameSetter;
-    private bool _troopsReady;
     private bool _controllerReady;
     private bool _battleReady;
     private int _battleSpeedIndex;
